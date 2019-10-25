@@ -1,0 +1,81 @@
+//..............................................................................
+//
+//  This file is part of the Jancy toolkit.
+//
+//  Jancy is distributed under the MIT license.
+//  For details see accompanying license.txt file,
+//  the public copy of which is also available at:
+//  http://tibbo.com/downloads/archive/jancy/license.txt
+//
+//..............................................................................
+
+// Jancy also supports full property declaration syntax, which allows declaring
+// complex properties with overloaded setters, member fields, helper methods,
+// constructors / destructors, etc.
+
+//..............................................................................
+
+property g_prop
+{
+	int m_x = 5;
+
+	int get()
+	{
+		printf("g_prop.get ()\n");
+		return m_x;
+	}
+
+	set(int x);
+
+	// overloaded setter
+
+	set(double x);
+
+	// helper method
+
+	update()
+	{
+		printf("g_prop.update ()\n");
+	}
+
+	// ...
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// like with classes, the implementation of methods may be placed outside of
+// the property body
+
+g_prop.set(int x)
+{
+	printf("g_prop.set (int %d)\n", x);
+	m_x = x;
+
+	update();
+}
+
+g_prop.set(double x)
+{
+	printf("g_prop.set (double %f)\n", x);
+	m_x = (int)x;
+
+	update();
+}
+
+//..............................................................................
+
+// entry point
+
+int main()
+{
+	printf("main ()\n");
+
+	int x = g_prop;
+
+	g_prop = 100;
+	g_prop = 5.2;
+
+	return 0;
+}
+
+//..............................................................................

@@ -1,0 +1,102 @@
+//..............................................................................
+//
+//  This file is part of the Jancy toolkit.
+//
+//  Jancy is distributed under the MIT license.
+//  For details see accompanying license.txt file,
+//  the public copy of which is also available at:
+//  http://tibbo.com/downloads/archive/jancy/license.txt
+//
+//..............................................................................
+
+// Schedule operator is used to ensure the function execution in the proper
+// environment. Some practical use examples for this operator:
+//   * calling a function in a worker thread
+//   * calling a function in response to a Windows message
+//   * calling a function with a mutex held
+
+//..............................................................................
+
+// jnc.Scheduler is a built-in jancy class
+
+class LockScheduler: jnc.Scheduler
+{
+	// note how schedule () has no information about argument signature of the
+	// target function
+
+	override schedule(function* f())
+	{
+		printf("lock before call...\n");
+		f();
+		printf("unlock after call...\n");
+	}
+}
+
+//..............................................................................
+
+foo(
+	int a,
+	int b,
+	function* completionFunc(
+		int,
+		int
+		)
+	)
+{
+	// do some work
+
+	for (int i = 0; i < 100; i += 10)
+	{
+		printf("working, %2d%%...\n", i);
+	}
+
+	// call completion proc
+
+	completionFunc(a, b);
+}
+
+bar(int x)
+{
+	printf("bar (%d)\n", x);
+}
+
+onComplete(
+	int a,
+	int b
+	)
+{
+	printf("onComplete (%d, %d)\n", a, b);
+}
+
+//..............................................................................
+
+// entry point
+
+int main()
+{
+	printf("main ()\n");
+
+	LockScheduler scheduler;
+
+	// use the @ (at) operator to create a scheduled pointer; the resulting
+	// scheduled pointer has the same argument signature as the target function
+
+	function* completionFunc(
+		int,
+		int
+		) = onComplete @ scheduler;
+
+	// pass a scheduled function pointer as a completion routine and you can be
+	// sure that the target function will be called in the proper environment
+
+	foo(10, 20, completionFunc);
+
+	// naturally, it's also OK to schedule a function call immediately, without
+	// saving a scheduled function pointer
+
+	(bar @ scheduler) (100);
+
+	return 0;
+}
+
+//..............................................................................

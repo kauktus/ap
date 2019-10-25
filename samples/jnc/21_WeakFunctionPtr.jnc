@@ -1,0 +1,80 @@
+//..............................................................................
+//
+//  This file is part of the Jancy toolkit.
+//
+//  Jancy is distributed under the MIT license.
+//  For details see accompanying license.txt file,
+//  the public copy of which is also available at:
+//  http://tibbo.com/downloads/archive/jancy/license.txt
+//
+//..............................................................................
+
+// Function pointers can be 'weak', meaning that they do not retain 'this'
+// argument captured in the closure from being collected by the GC.
+
+//..............................................................................
+
+class C1
+{
+	int m_x = -1;
+
+	construct()
+	{
+		printf("C1.construct ()\n");
+	}
+
+	foo(
+		int a,
+		int b,
+		int c
+		)
+	{
+		printf("C1.foo (%d, %d, %d) { m_x = %d }\n", a, b, c, m_x);
+	}
+}
+
+//..............................................................................
+
+// entry point
+
+int main()
+{
+	printf("main ()\n");
+
+	C1* c;
+	function weak* wf(int, int);
+
+	{ // get rid of tmp gc roots
+		c = new C1;  
+		wf = c.foo ~(,, 3);
+	}	
+
+	// weak function pointers cannot be called
+
+	// wf (10, 20); <-- error
+
+	// if we lose the strong pointer then the object will get destructed on the
+	// next GC run
+
+	// c = null;
+
+	printf("gc run...\n");
+	jnc.collectGarbage();
+
+	// try to recover the strong pointer
+
+	function* f(int, int) = wf;
+	if (f)
+	{
+		printf("object survived the GC run\n");
+		f(1, 2);
+	}
+	else
+	{
+		printf("object was collected during the GC run\n");
+	}
+
+	return 0;
+}
+
+//..............................................................................

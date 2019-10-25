@@ -1,0 +1,70 @@
+//..............................................................................
+//
+//  This file is part of the Jancy toolkit.
+//
+//  Jancy is distributed under the MIT license.
+//  For details see accompanying license.txt file,
+//  the public copy of which is also available at:
+//  http://tibbo.com/downloads/archive/jancy/license.txt
+//
+//..............................................................................
+
+// Jancy offers support for weak pointers to classes, i.e. pointers that do not
+// affect the lifetime of an object and do not retain it so the object can be
+// collected by GC.
+
+//..............................................................................
+
+class C1
+{
+	int m_x;
+
+	construct(int x)
+	{
+		printf("C1.construct (%d)\n", x);
+		m_x = x;
+	}
+}
+
+//..............................................................................
+
+// entry point
+
+int main()
+{
+	printf("main ()\n");
+
+	C1* c;
+	C1 weak* wc;
+
+	{ c = new C1(10); } // get rid of temp gc roots
+
+	wc = c;
+
+	// weak pointer cannot be used to access an object
+
+	// wc.m_x = 20; // <-- error
+
+	// if we lose the strong pointer then the object will get destructed on the
+	// next GC run
+
+	c = null;
+
+	printf("gc run...\n");
+
+	jnc.collectGarbage();
+
+	printf("gc run completed.\n");
+	
+	// try to recover the strong pointer
+
+	c = wc;
+	if (c)
+		printf("object survived the GC run\n");
+	else
+		printf("object was collected during the GC run\n");
+
+	return 0;
+}
+
+//..............................................................................

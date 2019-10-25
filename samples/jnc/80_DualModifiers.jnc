@@ -1,0 +1,92 @@
+//..............................................................................
+//
+//  This file is part of the Jancy toolkit.
+//
+//  Jancy is distributed under the MIT license.
+//  For details see accompanying license.txt file,
+//  the public copy of which is also available at:
+//  http://tibbo.com/downloads/archive/jancy/license.txt
+//
+//..............................................................................
+
+// Jancy features dual modifiers, i.e. modifiers with a different meaning for
+// aliens and friends of a namespace.
+
+// The dual modifier 'readonly' allows declaring types that behave like const
+// for aliens and non-const for friends. This is designed for providing
+// read-only access in a clean and natural way (instead of creating dummy
+// properties with trivial getters as is usually the way in other languages).
+
+// The dual modifier 'event' allows declaring events or event pointers. Aliens
+// can only subscribe/unsubscribe (event semantics), while friends must be also
+// able to fire the event (multicast semantics).
+
+//..............................................................................
+
+class C1
+{
+	// read-only field declared with the dual modifier readonly
+
+	int readonly m_progress;
+
+	// event field declared with the dual modifier event
+
+	event m_onCompleted();
+
+	work()
+	{
+		// insiders have write-access to m_progress
+
+		m_progress += 25;
+
+		if (m_progress >= 100)
+		{
+			// insiders have multicast-access to m_onCompleted
+
+			m_onCompleted();
+		}
+	}
+}
+
+//..............................................................................
+
+onCompleted()
+{
+	printf("onCompleted () -- work is finished\n");
+}
+
+//..............................................................................
+
+// entry point
+
+int main()
+{
+	printf("main ()\n");
+
+	C1 c;
+
+	// aliens have event-access to C1.m_onCompleted...
+
+	c.m_onCompleted += onCompleted;
+
+	// ...but no multicast-access
+
+	// c.m_onCompleted (); // <-- error
+
+	while (c.m_progress < 100)
+	{
+		c.work();
+
+		// outsiders have read-access to C1.m_x...
+
+		printf("progress = %d%%\n", c.m_progress);
+	}
+
+	// ...but no write-access
+
+	// c.m_progress = 100; // <-- error
+
+	return 0;
+}
+
+//..............................................................................

@@ -1,0 +1,72 @@
+//..............................................................................
+//
+//  This file is part of the Jancy toolkit.
+//
+//  Jancy is distributed under the MIT license.
+//  For details see accompanying license.txt file,
+//  the public copy of which is also available at:
+//  http://tibbo.com/downloads/archive/jancy/license.txt
+//
+//..............................................................................
+
+// Jancy features the most natural syntax imaginable for declaring properties
+// with no overloaded setters.
+
+//..............................................................................
+
+// we dare you to come up with a better syntax! ;)
+
+int property g_simpleProp;
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// accessors implementation
+
+int g_simpleProp.get()
+{
+	printf("g_simpleProp.get ()\n");
+	return rand() % 3;
+}
+
+g_simpleProp.set(int x)
+{
+	printf("g_simpleProp.set (%d)\n", x);
+}
+
+//..............................................................................
+
+// read-only properties are called 'const-properties' in Jancy. This is because
+// 'readonly' has a special meaning (see dual modifiers for more).
+
+int const property g_simpleReadOnlyProp;
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+int g_simpleReadOnlyProp.get()
+{
+	printf("g_simpleReadOnlyProp.get ()\n");
+	return rand() % 3;
+}
+
+//..............................................................................
+
+// entry point
+
+int main()
+{
+	printf("main ()\n");
+
+	int x = g_simpleProp;
+
+	g_simpleProp = 100;
+
+	int y = g_simpleReadOnlyProp;
+
+	// obviously, const properties cannot be written to
+
+	// g_simpleReadOnlyProp = 200; // <-- error
+
+	return 0;
+}
+
+//..............................................................................

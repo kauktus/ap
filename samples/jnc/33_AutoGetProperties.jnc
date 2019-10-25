@@ -1,0 +1,85 @@
+//..............................................................................
+//
+//  This file is part of the Jancy toolkit.
+//
+//  Jancy is distributed under the MIT license.
+//  For details see accompanying license.txt file,
+//  the public copy of which is also available at:
+//  http://tibbo.com/downloads/archive/jancy/license.txt
+//
+//..............................................................................
+
+// 99% of the time a property getter simply returns the value of some internal
+// field and all the property logic is actually contained in setter(s).
+
+// Jancy supports so-called 'autoget' properties thus sparing the developer
+// from the routine of writing trivial getters - the compiler will generate
+// both the field to store the property value and the getter to retrieve it.
+// The compiler will also bypass the getter completely whenever possible.
+
+//..............................................................................
+
+// simple autoget property declaration syntax
+
+int autoget property g_simpleProp;
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// setter implementation (no getter needed)
+
+g_simpleProp.set(int x)
+{
+	printf("g_simpleProp.set (%d)\n", x);
+
+	// by default, the name of a compiler-generated field is 'm_value'
+
+	m_value = x;
+}
+
+//..............................................................................
+
+// similar property declared using full syntax
+
+property g_prop
+{
+	// declaring a field with 'autoget' modifier implicitly makes the whole
+	// property autoget
+
+	int autoget m_x;
+
+	set(int x)
+	{
+		printf("g_prop.set (int %d)\n", x);
+		m_x = x;
+	}
+
+	// setters of autoget properties can be overloaded
+
+	set(double x)
+	{
+		printf("g_prop.set (double %f)\n", x);
+		m_x = (int)x;
+	}
+}
+
+//..............................................................................
+
+// entry point
+
+int main()
+{
+	printf("main ()\n");
+
+	g_simpleProp = 100;
+	int x = g_simpleProp;
+	printf("x = %d\n", x);
+
+	g_prop = 500;
+	g_prop = 2.5;
+	x = g_prop;
+	printf("x = %d\n", x);
+
+	return 0;
+}
+
+//..............................................................................

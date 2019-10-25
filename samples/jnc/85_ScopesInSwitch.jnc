@@ -1,0 +1,58 @@
+//..............................................................................
+//
+//  This file is part of the Jancy toolkit.
+//
+//  Jancy is distributed under the MIT license.
+//  For details see accompanying license.txt file,
+//  the public copy of which is also available at:
+//  http://tibbo.com/downloads/archive/jancy/license.txt
+//
+//..............................................................................
+
+// Unlike in C++ or Java, Jancy encloses all the case blocks in a switch
+// statement into implicit scopes. This means you are free to declare and
+// initialize local variables within case blocks of a switch statement.
+
+//..............................................................................
+
+// entry point
+
+int main()
+{
+	printf("main ()\n");
+
+	int result;
+
+	int a = rand() % 3;
+	switch (a)
+	{
+	case 0:
+		int i = 10;
+		result = i * 2;
+		break;
+
+	case 1:
+		// no problem to re-declare 'i': we are in a different scope
+
+		int i = 20;
+
+	case 2:
+		// no problem even when we fall-through from the previous case label
+
+		int i = 30;
+		result = i * 3;
+		break;
+
+	default:
+		// True programmers expect the unexpected! Nah, just kidding -- this
+		// 'default' is utterly pointless. But it's still OK to declare locals.
+
+		int i = 40;
+		result = i * 4;
+	}
+
+	printf("a = %d, result = %d\n", a, result);
+	return 0;
+}
+
+//..............................................................................
